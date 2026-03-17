@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rateio de Despesas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:      #1F4E79;
+    --blue-mid:  #2E75B6;
+    --blue-bg:   #EEF6FF;
+    --blue-in:   #D6EAFF;
+    --gray:      #F3F6FA;
+    --border:    #D0DCE8;
+    --text:      #1A2E42;
+    --muted:     #6B8299;
+    --green:     #107C10;
+    --white:     #FFFFFF;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--gray);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: .85rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.09);
+    width: 100%;
+    max-width: 640px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .card-head {
+    background: var(--blue);
+    color: var(--white);
+    padding: 13px 20px;
+    font-size: .88rem;
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+
+  .card-body { padding: 20px; }
+
+  /* ── CUSTO FIXO ── */
+  .custo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .custo-row label {
+    font-size: .88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--blue);
+  }
+
+  .custo-row input {
+    flex: 1;
+    border: 2px solid var(--blue-mid);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #003580;
+    text-align: right;
+    outline: none;
+    background: var(--blue-in);
+  }
+
+  .custo-row input:focus { border-color: var(--blue); background: #C8DFFF; }
+
+  /* ── OPERAÇÕES ── */
+  .ops-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ops-table th {
+    text-align: left;
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--muted);
+    padding: 0 8px 10px;
+  }
+
+  .ops-table th:last-child { text-align: right; }
+
+  .ops-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .ops-table tr:last-child td { border-bottom: none; }
+
+  .ops-table input[type="text"] {
+    width: 100%;
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--text);
+    outline: none;
+    background: transparent;
+  }
+
+  .ops-table input[type="text"]:focus {
+    border-color: var(--blue-mid);
+    background: var(--blue-bg);
+  }
+
+  .ops-table input[type="number"] {
+    width: 100%;
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-family: inherit;
+    font-size: .9rem;
+    font-weight: 600;
+    color: #003580;
+    text-align: right;
+    outline: none;
+    background: var(--blue-bg);
+  }
+
+  .ops-table input[type="number"]:focus {
+    border-color: var(--blue-mid);
+    background: var(--blue-in);
+  }
+
+  .ops-table .td-pct {
+    width: 72px;
+    text-align: right;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--blue-mid);
+    white-space: nowrap;
+  }
+
+  .ops-table .td-del {
+    width: 32px;
+    text-align: center;
+  }
+
+  .btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #C0CEDB;
+    font-size: .95rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: color .15s, background .15s;
+  }
+  .btn-del:hover { color: #C50F1F; background: #FEE; }
+
+  .total-row td {
+    padding-top: 12px !important;
+    border-top: 2px solid var(--blue) !important;
+    font-weight: 700;
+    color: var(--blue);
+    font-size: .9rem;
+    border-bottom: none !important;
+  }
+
+  .btn-add {
+    width: 100%;
+    margin-top: 12px;
+    padding: 9px;
+    background: none;
+    border: 1.5px dashed var(--blue-mid);
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--blue-mid);
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-add:hover { background: var(--blue-bg); }
+
+  /* ── RESULTADO ── */
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .result-table th {
+    background: var(--blue);
+    color: var(--white);
+    padding: 11px 14px;
+    font-size: .8rem;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .result-table th:first-child { text-align: left; }
+
+  .result-table td {
+    padding: 10px 14px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    font-size: .9rem;
+  }
+
+  .result-table td:first-child { text-align: left; font-weight: 500; }
+
+  .result-table tr:nth-child(even) td { background: var(--gray); }
+
+  .result-table tr.row-pct td {
+    background: var(--blue-bg);
+    color: var(--blue-mid);
+    font-weight: 600;
+    font-size: .8rem;
+    padding: 7px 14px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .result-table tr.row-pct td:first-child { color: var(--blue); }
+
+  .result-table tr.row-total td {
+    background: var(--blue);
+    color: var(--white);
+    font-weight: 700;
+    border: none;
+  }
+
+  .empty-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: .88rem;
+    padding: 24px;
+  }
+
+  /* ── ACTIONS ── */
+  .actions {
+    display: flex;
+    gap: 10px;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.08); }
+
+  .btn-excel { background: var(--green); color: #fff; }
+  .btn-print { background: var(--blue-mid); color: #fff; }
+  .btn-reset { background: var(--gray); color: var(--muted); border: 1.5px solid var(--border); }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .no-print { display: none !important; }
+    .card { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>📊 Rateio de Despesas</h1>
+<p class="subtitle">Distribuição pro rata com base no faturamento de cada operação</p>
+
+<!-- CUSTO FIXO -->
+<div class="card no-print">
+  <div class="card-head">Custo Fixo a Ratear (R$)</div>
+  <div class="card-body">
+    <div class="custo-row">
+      <label>R$</label>
+      <input type="text" id="custo-input" value="100.000" inputmode="numeric"
+             oninput="onCustoChange(this.value)" />
+    </div>
+  </div>
+</div>
+
+<!-- OPERAÇÕES -->
+<div class="card no-print">
+  <div class="card-head">Operações &amp; Faturamento</div>
+  <div class="card-body">
+    <table class="ops-table">
+      <thead>
+        <tr>
+          <th>Operação</th>
+          <th style="text-align:right">Faturamento (R$)</th>
+          <th style="text-align:right">%</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="ops-body"></tbody>
+    </table>
+    <button class="btn-add" onclick="addOp()">＋ Adicionar Operação</button>
+  </div>
+</div>
+
+<!-- RESULTADO -->
+<div class="card">
+  <div class="card-head">Resultado do Rateio</div>
+  <div class="card-body" style="padding:0">
+    <div id="result-wrap"></div>
+  </div>
+</div>
+
+<!-- BOTÕES -->
+<div class="actions no-print">
+  <button class="btn btn-excel" onclick="exportExcel()">⬇ Exportar Excel</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 Imprimir / PDF</button>
+  <button class="btn btn-reset" onclick="resetAll()">🔄 Limpar</button>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let ops = [
+  { id: 1, name: 'CENTRO',      fat: 300000 },
+  { id: 2, name: 'ONLINE',      fat: 300000 },
+  { id: 3, name: 'BOA VIAGEM',  fat: 150000 },
+  { id: 4, name: 'IMBIRIBEIRA', fat: 120000 },
+];
+let custo = 100000;
+let nextId = 5;
+
+// ─── PARSE / FORMAT ──────────────────────────────────────────────────────────
+function parseBR(str) {
+  // aceita "100.000,50" ou "100000" ou "100,000.50"
+  const s = String(str).trim();
+  // formato BR: ponto como milhar, vírgula como decimal
+  const brFormat = s.replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(brFormat);
+  return isNaN(n) ? 0 : n;
+}
+
+function fmtBR(n, decimals = 2) {
+  return n.toLocaleString('pt-BR', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+function fmtPct(p) {
+  return (p * 100).toLocaleString('pt-BR', {
+    minimumFractionDigits: 2, maximumFractionDigits: 2
+  }) + '%';
+}
+
+// ─── RENDER OPS ──────────────────────────────────────────────────────────────
+function renderOps() {
+  const total = ops.reduce((s, o) => s + o.fat, 0);
+  const body = document.getElementById('ops-body');
+
+  const rows = ops.map(op => {
+    const pct = total > 0 ? op.fat / total : 0;
+    return `<tr>
+      <td><input type="text" value="${esc(op.name)}"
+          oninput="setName(${op.id}, this.value)" placeholder="Operação"></td>
+      <td><input type="number" value="${op.fat || ''}"
+          oninput="setFat(${op.id}, this.value)" placeholder="0" min="0"></td>
+      <td class="td-pct">${total > 0 ? fmtPct(pct) : '—'}</td>
+      <td class="td-del"><button class="btn-del" onclick="removeOp(${op.id})" title="Remover">✕</button></td>
+    </tr>`;
+  });
+
+  const totalRow = `<tr class="total-row">
+    <td>TOTAL</td>
+    <td style="text-align:right">R$ ${fmtBR(total)}</td>
+    <td class="td-pct" style="color:var(--blue)">100%</td>
+    <td></td>
+  </tr>`;
+
+  body.innerHTML = rows.join('') + totalRow;
+}
+
+// ─── RENDER RESULT ───────────────────────────────────────────────────────────
+function renderResult() {
+  const wrap = document.getElementById('result-wrap');
+  const total = ops.reduce((s, o) => s + o.fat, 0);
+
+  if (ops.length === 0 || total === 0) {
+    wrap.innerHTML = '<p class="empty-msg">Insira o faturamento das operações acima.</p>';
+    return;
+  }
+
+  const pcts = ops.map(o => o.fat / total);
+  const rows = ops.map((op, i) => {
+    const val = custo * pcts[i];
+    return `<tr>
+      <td>${esc(op.name || '—')}</td>
+      <td>${fmtPct(pcts[i])}</td>
+      <td>R$ ${fmtBR(op.fat)}</td>
+      <td><strong>R$ ${fmtBR(val)}</strong></td>
+    </tr>`;
+  });
+
+  wrap.innerHTML = `
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>Operação</th>
+          <th>% Participação</th>
+          <th>Faturamento</th>
+          <th>Custo Rateado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-pct">
+          <td>Custo fixo a ratear</td>
+          <td>—</td>
+          <td>Total: R$ ${fmtBR(total)}</td>
+          <td>R$ ${fmtBR(custo)}</td>
+        </tr>
+        ${rows.join('')}
+        <tr class="row-total">
+          <td>TOTAL</td>
+          <td>100%</td>
+          <td>R$ ${fmtBR(total)}</td>
+          <td>R$ ${fmtBR(custo)}</td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+function render() { renderOps(); renderResult(); }
+
+// ─── MUTATIONS ───────────────────────────────────────────────────────────────
+function onCustoChange(val) {
+  custo = parseBR(val);
+  renderResult();
+}
+
+function setName(id, val) {
+  const op = ops.find(o => o.id === id);
+  if (op) { op.name = val; renderResult(); }
+}
+
+function setFat(id, val) {
+  const op = ops.find(o => o.id === id);
+  if (op) {
+    op.fat = parseFloat(val) || 0;
+    renderOps();
+    renderResult();
+  }
+}
+
+function addOp() {
+  ops.push({ id: nextId++, name: '', fat: 0 });
+  render();
+  const inputs = document.getElementById('ops-body').querySelectorAll('input[type="text"]');
+  inputs[inputs.length - 1]?.focus();
+}
+
+function removeOp(id) {
+  ops = ops.filter(o => o.id !== id);
+  render();
+}
+
+function resetAll() {
+  if (!confirm('Limpar tudo?')) return;
+  ops = [];
+  custo = 0;
+  document.getElementById('custo-input').value = '';
+  render();
+}
+
+// ─── EXPORT EXCEL ────────────────────────────────────────────────────────────
+function exportExcel() {
+  const total = ops.reduce((s, o) => s + o.fat, 0);
+  const pcts  = ops.map(o => total > 0 ? o.fat / total : 0);
+
+  const rows = [
+    ['RATEIO DE DESPESAS'],
+    [],
+    ['Custo Fixo Total (R$)', custo],
+    ['Faturamento Total (R$)', total],
+    [],
+    ['Operação', '% Participação', 'Faturamento (R$)', 'Custo Rateado (R$)'],
+    ...ops.map((op, i) => [op.name, pcts[i], op.fat, custo * pcts[i]]),
+    [],
+    ['TOTAL', 1, total, custo],
+  ];
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{ wch: 20 }, { wch: 16 }, { wch: 20 }, { wch: 20 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'Rateio');
+  XLSX.writeFile(wb, 'rateio.xlsx');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>

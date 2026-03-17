@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFPRINT — Ferramentas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F3F6FA;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+  h1 { font-size: 2rem; font-weight: 700; color: #1F4E79; margin-bottom: 6px; }
+  .sub { color: #6B8299; font-size: .95rem; margin-bottom: 40px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.09);
+    padding: 28px 32px;
+    width: 240px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .15s, box-shadow .15s;
+    border-top: 4px solid #2E75B6;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.13); }
+  .card .icon { font-size: 2rem; margin-bottom: 12px; }
+  .card h2 { font-size: 1rem; font-weight: 700; color: #1F4E79; margin-bottom: 6px; }
+  .card p { font-size: .82rem; color: #6B8299; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <h1>AFPRINT</h1>
+  <p class="sub">Ferramentas internas</p>
+  <div class="grid">
+    <a class="card" href="rateio/">
+      <div class="icon">📊</div>
+      <h2>Rateio de Despesas</h2>
+      <p>Distribuição pro rata de custos fixos por operação</p>
+    </a>
+  </div>
+</body>
+</html>
