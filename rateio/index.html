@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rateio de Despesas</title>
+<title>Rateio de Despesas · AFPRINT</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -18,6 +18,11 @@
     --text:      #1A2E42;
     --muted:     #6B8299;
     --green:     #107C10;
+    --green-bg:  #E6F4E6;
+    --orange:    #C55A00;
+    --orange-bg: #FFF4E0;
+    --red:       #C50F1F;
+    --red-bg:    #FEE7E7;
     --white:     #FFFFFF;
   }
 
@@ -32,25 +37,15 @@
     padding: 32px 16px;
   }
 
-  h1 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--blue);
-    margin-bottom: 4px;
-  }
-
-  .subtitle {
-    font-size: .85rem;
-    color: var(--muted);
-    margin-bottom: 28px;
-  }
+  h1 { font-size: 1.35rem; font-weight: 700; color: var(--blue); margin-bottom: 4px; }
+  .subtitle { font-size: .85rem; color: var(--muted); margin-bottom: 28px; }
 
   .card {
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0,0,0,.09);
     width: 100%;
-    max-width: 640px;
+    max-width: 700px;
     overflow: hidden;
     margin-bottom: 16px;
   }
@@ -62,24 +57,22 @@
     font-size: .88rem;
     font-weight: 600;
     letter-spacing: .2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-head .badge {
+    font-size: .75rem;
+    font-weight: 500;
+    opacity: .8;
   }
 
   .card-body { padding: 20px; }
 
   /* ── CUSTO FIXO ── */
-  .custo-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .custo-row label {
-    font-size: .88rem;
-    font-weight: 600;
-    white-space: nowrap;
-    color: var(--blue);
-  }
-
+  .custo-row { display: flex; align-items: center; gap: 12px; }
+  .custo-row label { font-size: .88rem; font-weight: 600; white-space: nowrap; color: var(--blue); }
   .custo-row input {
     flex: 1;
     border: 2px solid var(--blue-mid);
@@ -93,16 +86,15 @@
     outline: none;
     background: var(--blue-in);
   }
-
   .custo-row input:focus { border-color: var(--blue); background: #C8DFFF; }
 
-  /* ── OPERAÇÕES ── */
-  .ops-table {
+  /* ── TABLES SHARED ── */
+  .ops-table, .meta-table {
     width: 100%;
     border-collapse: collapse;
   }
 
-  .ops-table th {
+  .ops-table th, .meta-table th {
     text-align: left;
     font-size: .75rem;
     font-weight: 600;
@@ -111,18 +103,19 @@
     color: var(--muted);
     padding: 0 8px 10px;
   }
+  .ops-table th:last-child, .meta-table th:last-child { text-align: right; }
+  .ops-table th:nth-child(2), .ops-table th:nth-child(3),
+  .meta-table th:nth-child(2) { text-align: right; }
 
-  .ops-table th:last-child { text-align: right; }
-
-  .ops-table td {
+  .ops-table td, .meta-table td {
     padding: 5px 8px;
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
   }
+  .ops-table tr:last-child td, .meta-table tr:last-child td { border-bottom: none; }
 
-  .ops-table tr:last-child td { border-bottom: none; }
-
-  .ops-table input[type="text"] {
+  .ops-table input[type="text"],
+  .meta-table input[type="text"] {
     width: 100%;
     border: 1.5px solid transparent;
     border-radius: 6px;
@@ -134,13 +127,14 @@
     outline: none;
     background: transparent;
   }
-
-  .ops-table input[type="text"]:focus {
+  .ops-table input[type="text"]:focus,
+  .meta-table input[type="text"]:focus {
     border-color: var(--blue-mid);
     background: var(--blue-bg);
   }
 
-  .ops-table input[type="number"] {
+  .ops-table input[type="number"],
+  .meta-table input[type="number"] {
     width: 100%;
     border: 1.5px solid transparent;
     border-radius: 6px;
@@ -153,140 +147,177 @@
     outline: none;
     background: var(--blue-bg);
   }
-
-  .ops-table input[type="number"]:focus {
+  .ops-table input[type="number"]:focus,
+  .meta-table input[type="number"]:focus {
     border-color: var(--blue-mid);
     background: var(--blue-in);
   }
 
-  .ops-table .td-pct {
-    width: 72px;
-    text-align: right;
-    font-size: .82rem;
-    font-weight: 600;
-    color: var(--blue-mid);
-    white-space: nowrap;
-  }
-
-  .ops-table .td-del {
-    width: 32px;
-    text-align: center;
-  }
+  .td-pct { width: 72px; text-align: right; font-size: .82rem; font-weight: 600; color: var(--blue-mid); white-space: nowrap; }
+  .td-del { width: 32px; text-align: center; }
 
   .btn-del {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #C0CEDB;
-    font-size: .95rem;
-    padding: 3px 6px;
-    border-radius: 4px;
-    transition: color .15s, background .15s;
+    background: none; border: none; cursor: pointer;
+    color: #C0CEDB; font-size: .95rem; padding: 3px 6px;
+    border-radius: 4px; transition: color .15s, background .15s;
   }
-  .btn-del:hover { color: #C50F1F; background: #FEE; }
+  .btn-del:hover { color: var(--red); background: var(--red-bg); }
 
   .total-row td {
     padding-top: 12px !important;
     border-top: 2px solid var(--blue) !important;
-    font-weight: 700;
-    color: var(--blue);
-    font-size: .9rem;
+    font-weight: 700; color: var(--blue); font-size: .9rem;
     border-bottom: none !important;
   }
 
   .btn-add {
-    width: 100%;
-    margin-top: 12px;
-    padding: 9px;
-    background: none;
-    border: 1.5px dashed var(--blue-mid);
-    border-radius: 7px;
-    font-family: inherit;
-    font-size: .82rem;
-    font-weight: 500;
-    color: var(--blue-mid);
-    cursor: pointer;
+    width: 100%; margin-top: 12px; padding: 9px;
+    background: none; border: 1.5px dashed var(--blue-mid);
+    border-radius: 7px; font-family: inherit; font-size: .82rem;
+    font-weight: 500; color: var(--blue-mid); cursor: pointer;
     transition: background .15s;
   }
   .btn-add:hover { background: var(--blue-bg); }
 
-  /* ── RESULTADO ── */
-  .result-table {
-    width: 100%;
-    border-collapse: collapse;
+  /* ── METAS CONTROLS ── */
+  .meta-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: end;
+    margin-bottom: 20px;
   }
 
-  .result-table th {
-    background: var(--blue);
-    color: var(--white);
-    padding: 11px 14px;
-    font-size: .8rem;
-    font-weight: 600;
-    text-align: right;
-  }
-
-  .result-table th:first-child { text-align: left; }
-
-  .result-table td {
-    padding: 10px 14px;
-    text-align: right;
-    border-bottom: 1px solid var(--border);
-    font-size: .9rem;
-  }
-
-  .result-table td:first-child { text-align: left; font-weight: 500; }
-
-  .result-table tr:nth-child(even) td { background: var(--gray); }
-
-  .result-table tr.row-pct td {
-    background: var(--blue-bg);
-    color: var(--blue-mid);
-    font-weight: 600;
-    font-size: .8rem;
-    padding: 7px 14px;
-    border-bottom: 2px solid var(--border);
-  }
-
-  .result-table tr.row-pct td:first-child { color: var(--blue); }
-
-  .result-table tr.row-total td {
-    background: var(--blue);
-    color: var(--white);
-    font-weight: 700;
-    border: none;
-  }
-
-  .empty-msg {
-    text-align: center;
-    color: var(--muted);
-    font-size: .88rem;
-    padding: 24px;
-  }
-
-  /* ── ACTIONS ── */
-  .actions {
-    display: flex;
-    gap: 10px;
-    max-width: 640px;
-    width: 100%;
-  }
-
-  .btn {
-    flex: 1;
-    padding: 11px;
-    border: none;
+  .meta-global-group { display: flex; flex-direction: column; gap: 5px; }
+  .meta-global-group label { font-size: .78rem; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: .4px; }
+  .meta-global-group input {
+    border: 2px solid var(--blue-mid);
     border-radius: 8px;
+    padding: 10px 14px;
     font-family: inherit;
-    font-size: .88rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #003580;
+    text-align: right;
+    outline: none;
+    background: var(--blue-in);
+    width: 100%;
+  }
+  .meta-global-group input:focus { border-color: var(--blue); background: #C8DFFF; }
+
+  .periodo-group { display: flex; flex-direction: column; gap: 5px; }
+  .periodo-group label { font-size: .78rem; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: .4px; }
+  .periodo-inputs { display: flex; align-items: center; gap: 6px; }
+  .periodo-inputs span { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+  .periodo-inputs input {
+    width: 60px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 8px;
+    font-family: inherit;
+    font-size: .9rem;
     font-weight: 600;
-    cursor: pointer;
+    color: var(--text);
+    text-align: center;
+    outline: none;
+    background: var(--white);
+  }
+  .periodo-inputs input:focus { border-color: var(--blue-mid); background: var(--blue-bg); }
+
+  .btn-distribuir {
+    width: 100%; margin-top: 12px; padding: 9px 14px;
+    background: var(--blue-mid); color: #fff;
+    border: none; border-radius: 7px; font-family: inherit;
+    font-size: .82rem; font-weight: 600; cursor: pointer;
     transition: filter .15s;
   }
-  .btn:hover { filter: brightness(1.08); }
+  .btn-distribuir:hover { filter: brightness(1.1); }
 
-  .btn-excel { background: var(--green); color: #fff; }
-  .btn-print { background: var(--blue-mid); color: #fff; }
-  .btn-reset { background: var(--gray); color: var(--muted); border: 1.5px solid var(--border); }
+  .meta-total-row td {
+    padding-top: 12px !important;
+    border-top: 2px solid var(--blue) !important;
+    font-weight: 700; color: var(--blue); font-size: .9rem;
+    border-bottom: none !important; text-align: right;
+  }
+  .meta-total-row td:first-child { text-align: left; }
+
+  /* ── RESULTADO RATEIO ── */
+  .result-table { width: 100%; border-collapse: collapse; }
+  .result-table th {
+    background: var(--blue); color: var(--white);
+    padding: 11px 14px; font-size: .78rem; font-weight: 600; text-align: right;
+  }
+  .result-table th:first-child { text-align: left; }
+  .result-table td { padding: 10px 14px; text-align: right; border-bottom: 1px solid var(--border); font-size: .88rem; }
+  .result-table td:first-child { text-align: left; font-weight: 500; }
+  .result-table tr:nth-child(even) td { background: var(--gray); }
+  .result-table tr.row-pct td {
+    background: var(--blue-bg); color: var(--blue-mid); font-weight: 600;
+    font-size: .8rem; padding: 7px 14px; border-bottom: 2px solid var(--border);
+  }
+  .result-table tr.row-pct td:first-child { color: var(--blue); }
+  .result-table tr.row-total td {
+    background: var(--blue); color: var(--white); font-weight: 700; border: none;
+  }
+
+  /* ── ACOMPANHAMENTO ── */
+  .acomp-table { width: 100%; border-collapse: collapse; }
+  .acomp-table th {
+    background: var(--blue); color: var(--white);
+    padding: 11px 14px; font-size: .78rem; font-weight: 600; text-align: right;
+    white-space: nowrap;
+  }
+  .acomp-table th:first-child { text-align: left; }
+  .acomp-table td {
+    padding: 10px 14px; text-align: right;
+    border-bottom: 1px solid var(--border); font-size: .88rem;
+  }
+  .acomp-table td:first-child { text-align: left; font-weight: 600; }
+  .acomp-table tr:nth-child(even) td { background: var(--gray); }
+  .acomp-table tr.row-total td {
+    background: var(--blue); color: var(--white); font-weight: 700; border: none;
+  }
+
+  .badge-pct {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: .8rem;
+    font-weight: 700;
+  }
+  .badge-green  { background: var(--green-bg);  color: var(--green); }
+  .badge-orange { background: var(--orange-bg); color: var(--orange); }
+  .badge-red    { background: var(--red-bg);    color: var(--red); }
+
+  .dias-restantes-note {
+    font-size: .78rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+    padding: 8px 14px;
+    background: var(--gray);
+    border-bottom: 1px solid var(--border);
+  }
+  .dias-restantes-note strong { color: var(--blue); }
+
+  .empty-msg { text-align: center; color: var(--muted); font-size: .88rem; padding: 24px; }
+
+  /* ── ACTIONS ── */
+  .actions { display: flex; gap: 10px; max-width: 700px; width: 100%; }
+  .btn {
+    flex: 1; padding: 11px; border: none; border-radius: 8px;
+    font-family: inherit; font-size: .88rem; font-weight: 600;
+    cursor: pointer; transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn-excel  { background: var(--green);    color: #fff; }
+  .btn-print  { background: var(--blue-mid); color: #fff; }
+  .btn-reset  { background: var(--gray); color: var(--muted); border: 1.5px solid var(--border); }
+
+  @media (max-width: 560px) {
+    .meta-top { grid-template-columns: 1fr; }
+    .acomp-table th:nth-child(3),
+    .acomp-table td:nth-child(3) { display: none; }
+  }
 
   @media print {
     body { background: white; padding: 0; }
@@ -297,10 +328,10 @@
 </head>
 <body>
 
-<h1>📊 Rateio de Despesas</h1>
-<p class="subtitle">Distribuição pro rata com base no faturamento de cada operação</p>
+<h1>📊 Rateio & Metas · AFPRINT</h1>
+<p class="subtitle">Rateio proporcional de custos + acompanhamento de metas por operação</p>
 
-<!-- CUSTO FIXO -->
+<!-- ① CUSTO FIXO -->
 <div class="card no-print">
   <div class="card-head">Custo Fixo a Ratear (R$)</div>
   <div class="card-body">
@@ -312,9 +343,9 @@
   </div>
 </div>
 
-<!-- OPERAÇÕES -->
+<!-- ② OPERAÇÕES -->
 <div class="card no-print">
-  <div class="card-head">Operações &amp; Faturamento</div>
+  <div class="card-head">Operações &amp; Faturamento Realizado</div>
   <div class="card-body">
     <table class="ops-table">
       <thead>
@@ -327,16 +358,69 @@
       </thead>
       <tbody id="ops-body"></tbody>
     </table>
-    <button class="btn-add" onclick="addOp()">＋ Adicionar Operação</button>
+    <button class="btn-add no-print" onclick="addOp()">＋ Adicionar Operação</button>
   </div>
 </div>
 
-<!-- RESULTADO -->
+<!-- ③ METAS -->
+<div class="card no-print">
+  <div class="card-head">Metas de Faturamento Mensal</div>
+  <div class="card-body">
+
+    <div class="meta-top">
+      <div class="meta-global-group">
+        <label>Meta Global do Mês (R$)</label>
+        <input type="text" id="meta-global-input" placeholder="0" inputmode="numeric"
+               oninput="onMetaGlobalChange(this.value)" />
+      </div>
+      <div class="periodo-group">
+        <label>Período</label>
+        <div class="periodo-inputs">
+          <span>Dia</span>
+          <input type="number" id="dia-atual-input" value="17" min="1" max="31"
+                 oninput="onPeriodoChange()" />
+          <span>de</span>
+          <input type="number" id="dias-mes-input" value="31" min="1" max="31"
+                 oninput="onPeriodoChange()" />
+          <span>dias</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-distribuir" onclick="distribuirMeta()">
+      ↕ Distribuir meta proporcionalmente entre operações
+    </button>
+
+    <div style="height:16px"></div>
+
+    <table class="meta-table">
+      <thead>
+        <tr>
+          <th>Operação</th>
+          <th style="text-align:right">Meta Mensal (R$)</th>
+        </tr>
+      </thead>
+      <tbody id="meta-body"></tbody>
+    </table>
+
+  </div>
+</div>
+
+<!-- ④ RESULTADO RATEIO -->
 <div class="card">
-  <div class="card-head">Resultado do Rateio</div>
+  <div class="card-head">Resultado do Rateio de Custos</div>
   <div class="card-body" style="padding:0">
     <div id="result-wrap"></div>
   </div>
+</div>
+
+<!-- ⑤ ACOMPANHAMENTO DE METAS -->
+<div class="card">
+  <div class="card-head">
+    Acompanhamento de Metas
+    <span class="badge" id="badge-periodo"></span>
+  </div>
+  <div id="acomp-wrap"></div>
 </div>
 
 <!-- BOTÕES -->
@@ -355,44 +439,40 @@ let ops = [
   { id: 3, name: 'BOA VIAGEM',  fat: 150000 },
   { id: 4, name: 'IMBIRIBEIRA', fat: 120000 },
 ];
-let custo = 100000;
-let nextId = 5;
+let metas   = {};   // { opId: value }
+let custo      = 100000;
+let metaGlobal = 0;
+let diaAtual   = 17;
+let diasMes    = 31;
+let nextId     = 5;
 
 // ─── PARSE / FORMAT ──────────────────────────────────────────────────────────
 function parseBR(str) {
-  // aceita "100.000,50" ou "100000" ou "100,000.50"
   const s = String(str).trim();
-  // formato BR: ponto como milhar, vírgula como decimal
-  const brFormat = s.replace(/\./g, '').replace(',', '.');
-  const n = parseFloat(brFormat);
+  const n = parseFloat(s.replace(/\./g, '').replace(',', '.'));
   return isNaN(n) ? 0 : n;
 }
 
-function fmtBR(n, decimals = 2) {
-  return n.toLocaleString('pt-BR', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
+function fmtBR(n, dec = 2) {
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
 }
 
 function fmtPct(p) {
-  return (p * 100).toLocaleString('pt-BR', {
-    minimumFractionDigits: 2, maximumFractionDigits: 2
-  }) + '%';
+  return (p * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
 }
+
+function getMeta(id) { return metas[id] || 0; }
 
 // ─── RENDER OPS ──────────────────────────────────────────────────────────────
 function renderOps() {
   const total = ops.reduce((s, o) => s + o.fat, 0);
-  const body = document.getElementById('ops-body');
+  const body  = document.getElementById('ops-body');
 
   const rows = ops.map(op => {
     const pct = total > 0 ? op.fat / total : 0;
     return `<tr>
-      <td><input type="text" value="${esc(op.name)}"
-          oninput="setName(${op.id}, this.value)" placeholder="Operação"></td>
-      <td><input type="number" value="${op.fat || ''}"
-          oninput="setFat(${op.id}, this.value)" placeholder="0" min="0"></td>
+      <td><input type="text"   value="${esc(op.name)}" oninput="setName(${op.id},this.value)" placeholder="Operação"></td>
+      <td><input type="number" value="${op.fat||''}"   oninput="setFat(${op.id},this.value)"  placeholder="0" min="0"></td>
       <td class="td-pct">${total > 0 ? fmtPct(pct) : '—'}</td>
       <td class="td-del"><button class="btn-del" onclick="removeOp(${op.id})" title="Remover">✕</button></td>
     </tr>`;
@@ -408,9 +488,31 @@ function renderOps() {
   body.innerHTML = rows.join('') + totalRow;
 }
 
-// ─── RENDER RESULT ───────────────────────────────────────────────────────────
+// ─── RENDER META TABLE ───────────────────────────────────────────────────────
+function renderMetaTable() {
+  const body      = document.getElementById('meta-body');
+  const totalMeta = ops.reduce((s, o) => s + getMeta(o.id), 0);
+
+  const rows = ops.map(op => {
+    const m = getMeta(op.id);
+    return `<tr>
+      <td style="padding-left:8px;font-weight:500">${esc(op.name || '—')}</td>
+      <td><input type="number" value="${m || ''}" oninput="setMeta(${op.id},this.value)"
+          placeholder="0" min="0" style="max-width:180px;margin-left:auto;display:block"></td>
+    </tr>`;
+  });
+
+  const totalRow = `<tr class="meta-total-row">
+    <td>TOTAL</td>
+    <td>R$ ${fmtBR(totalMeta)}</td>
+  </tr>`;
+
+  body.innerHTML = rows.join('') + totalRow;
+}
+
+// ─── RENDER RESULTADO RATEIO ─────────────────────────────────────────────────
 function renderResult() {
-  const wrap = document.getElementById('result-wrap');
+  const wrap  = document.getElementById('result-wrap');
   const total = ops.reduce((s, o) => s + o.fat, 0);
 
   if (ops.length === 0 || total === 0) {
@@ -419,6 +521,7 @@ function renderResult() {
   }
 
   const pcts = ops.map(o => o.fat / total);
+
   const rows = ops.map((op, i) => {
     const val = custo * pcts[i];
     return `<tr>
@@ -448,8 +551,7 @@ function renderResult() {
         </tr>
         ${rows.join('')}
         <tr class="row-total">
-          <td>TOTAL</td>
-          <td>100%</td>
+          <td>TOTAL</td><td>100%</td>
           <td>R$ ${fmtBR(total)}</td>
           <td>R$ ${fmtBR(custo)}</td>
         </tr>
@@ -457,26 +559,118 @@ function renderResult() {
     </table>`;
 }
 
-function render() { renderOps(); renderResult(); }
+// ─── RENDER ACOMPANHAMENTO ───────────────────────────────────────────────────
+function renderAcompanhamento() {
+  const wrap     = document.getElementById('acomp-wrap');
+  const badge    = document.getElementById('badge-periodo');
+  const diasRest = Math.max(0, diasMes - diaAtual);
+
+  badge.textContent = `Dia ${diaAtual} de ${diasMes} · ${diasRest} dia${diasRest !== 1 ? 's' : ''} restante${diasRest !== 1 ? 's' : ''}`;
+
+  const totalMeta = ops.reduce((s, o) => s + getMeta(o.id), 0);
+  const totalFat  = ops.reduce((s, o) => s + o.fat, 0);
+
+  if (ops.length === 0 || totalMeta === 0) {
+    wrap.innerHTML = '<p class="empty-msg">Defina as metas por operação acima.</p>';
+    return;
+  }
+
+  function badgePct(p) {
+    if (p >= 1)   return `<span class="badge-pct badge-green">${fmtPct(p)}</span>`;
+    if (p >= 0.8) return `<span class="badge-pct badge-orange">${fmtPct(p)}</span>`;
+    return `<span class="badge-pct badge-red">${fmtPct(p)}</span>`;
+  }
+
+  function metaDiaria(falta) {
+    if (falta <= 0)     return '<span style="color:var(--green);font-weight:700">✓ Meta atingida</span>';
+    if (diasRest === 0) return '<span style="color:var(--red)">Prazo esgotado</span>';
+    return `R$ ${fmtBR(falta / diasRest)}`;
+  }
+
+  const rows = ops.map(op => {
+    const meta  = getMeta(op.id);
+    const fat   = op.fat;
+    const pct   = meta > 0 ? fat / meta : 0;
+    const falta = Math.max(0, meta - fat);
+    return `<tr>
+      <td>${esc(op.name || '—')}</td>
+      <td>R$ ${fmtBR(fat)}</td>
+      <td>R$ ${fmtBR(meta)}</td>
+      <td>${meta > 0 ? badgePct(pct) : '—'}</td>
+      <td>${meta > 0 ? (falta > 0 ? `R$ ${fmtBR(falta)}` : '<span style="color:var(--green)">—</span>') : '—'}</td>
+      <td style="white-space:nowrap">${meta > 0 ? metaDiaria(falta) : '—'}</td>
+    </tr>`;
+  });
+
+  const totalFalta = Math.max(0, totalMeta - totalFat);
+  const totalPct   = totalMeta > 0 ? totalFat / totalMeta : 0;
+
+  wrap.innerHTML = `
+    <div class="dias-restantes-note">
+      Faturamento realizado até o dia <strong>${diaAtual}</strong> ·
+      <strong>${diasRest}</strong> dia${diasRest !== 1 ? 's' : ''} restante${diasRest !== 1 ? 's' : ''} para fechar o mês
+    </div>
+    <table class="acomp-table">
+      <thead>
+        <tr>
+          <th>Operação</th>
+          <th>Realizado</th>
+          <th>Meta</th>
+          <th>% Atingido</th>
+          <th>Falta</th>
+          <th>Nec. / dia</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.join('')}
+        <tr class="row-total">
+          <td>TOTAL</td>
+          <td>R$ ${fmtBR(totalFat)}</td>
+          <td>R$ ${fmtBR(totalMeta)}</td>
+          <td>${fmtPct(totalPct)}</td>
+          <td>${totalFalta > 0 ? `R$ ${fmtBR(totalFalta)}` : '✓'}</td>
+          <td>${diasRest > 0 && totalFalta > 0 ? `R$ ${fmtBR(totalFalta / diasRest)}` : (totalFalta === 0 ? '✓' : '—')}</td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+function render() { renderOps(); renderMetaTable(); renderResult(); renderAcompanhamento(); }
 
 // ─── MUTATIONS ───────────────────────────────────────────────────────────────
-function onCustoChange(val) {
-  custo = parseBR(val);
-  renderResult();
+function onCustoChange(val)      { custo = parseBR(val); renderResult(); }
+function onMetaGlobalChange(val) { metaGlobal = parseBR(val); }
+function onPeriodoChange() {
+  diaAtual = parseInt(document.getElementById('dia-atual-input').value) || 0;
+  diasMes  = parseInt(document.getElementById('dias-mes-input').value)  || 30;
+  renderAcompanhamento();
+}
+
+function distribuirMeta() {
+  const totalFat = ops.reduce((s, o) => s + o.fat, 0);
+  if (metaGlobal === 0) return;
+  ops.forEach(op => {
+    const pct = totalFat > 0 ? op.fat / totalFat : 1 / ops.length;
+    metas[op.id] = Math.round(metaGlobal * pct * 100) / 100;
+  });
+  renderMetaTable();
+  renderAcompanhamento();
+}
+
+function setMeta(id, val) {
+  metas[id] = parseFloat(val) || 0;
+  renderMetaTable();
+  renderAcompanhamento();
 }
 
 function setName(id, val) {
   const op = ops.find(o => o.id === id);
-  if (op) { op.name = val; renderResult(); }
+  if (op) { op.name = val; renderResult(); renderMetaTable(); renderAcompanhamento(); }
 }
 
 function setFat(id, val) {
   const op = ops.find(o => o.id === id);
-  if (op) {
-    op.fat = parseFloat(val) || 0;
-    renderOps();
-    renderResult();
-  }
+  if (op) { op.fat = parseFloat(val) || 0; render(); }
 }
 
 function addOp() {
@@ -488,39 +682,60 @@ function addOp() {
 
 function removeOp(id) {
   ops = ops.filter(o => o.id !== id);
+  delete metas[id];
   render();
 }
 
 function resetAll() {
   if (!confirm('Limpar tudo?')) return;
-  ops = [];
-  custo = 0;
-  document.getElementById('custo-input').value = '';
+  ops = []; metas = {}; custo = 0; metaGlobal = 0;
+  document.getElementById('custo-input').value       = '';
+  document.getElementById('meta-global-input').value = '';
   render();
 }
 
 // ─── EXPORT EXCEL ────────────────────────────────────────────────────────────
 function exportExcel() {
-  const total = ops.reduce((s, o) => s + o.fat, 0);
-  const pcts  = ops.map(o => total > 0 ? o.fat / total : 0);
-
-  const rows = [
-    ['RATEIO DE DESPESAS'],
-    [],
-    ['Custo Fixo Total (R$)', custo],
-    ['Faturamento Total (R$)', total],
-    [],
-    ['Operação', '% Participação', 'Faturamento (R$)', 'Custo Rateado (R$)'],
-    ...ops.map((op, i) => [op.name, pcts[i], op.fat, custo * pcts[i]]),
-    [],
-    ['TOTAL', 1, total, custo],
-  ];
+  const totalFat  = ops.reduce((s, o) => s + o.fat, 0);
+  const totalMeta = ops.reduce((s, o) => s + getMeta(o.id), 0);
+  const diasRest  = Math.max(0, diasMes - diaAtual);
+  const pcts      = ops.map(o => totalFat > 0 ? o.fat / totalFat : 0);
 
   const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [{ wch: 20 }, { wch: 16 }, { wch: 20 }, { wch: 20 }];
-  XLSX.utils.book_append_sheet(wb, ws, 'Rateio');
-  XLSX.writeFile(wb, 'rateio.xlsx');
+
+  // ── Aba Rateio ──
+  const rateioRows = [
+    ['RATEIO DE DESPESAS — AFPRINT'], [],
+    ['Custo Fixo Total (R$)', custo],
+    ['Faturamento Total (R$)', totalFat], [],
+    ['Operação', '% Participação', 'Faturamento (R$)', 'Custo Rateado (R$)'],
+    ...ops.map((op, i) => [op.name, pcts[i], op.fat, custo * pcts[i]]),
+    [], ['TOTAL', 1, totalFat, custo],
+  ];
+  const wsR = XLSX.utils.aoa_to_sheet(rateioRows);
+  wsR['!cols'] = [{ wch: 18 }, { wch: 14 }, { wch: 18 }, { wch: 18 }];
+  XLSX.utils.book_append_sheet(wb, wsR, 'Rateio');
+
+  // ── Aba Metas ──
+  const metasRows = [
+    ['ACOMPANHAMENTO DE METAS — AFPRINT'], [],
+    ['Dia atual', diaAtual], ['Dias no mês', diasMes], ['Dias restantes', diasRest], [],
+    ['Operação', 'Realizado (R$)', 'Meta (R$)', '% Atingido', 'Falta (R$)', 'Nec./dia (R$)'],
+    ...ops.map(op => {
+      const m = getMeta(op.id);
+      const falta = Math.max(0, m - op.fat);
+      return [op.name, op.fat, m, m > 0 ? op.fat / m : 0, falta, diasRest > 0 && falta > 0 ? falta / diasRest : 0];
+    }),
+    [], ['TOTAL', totalFat, totalMeta,
+         totalMeta > 0 ? totalFat / totalMeta : 0,
+         Math.max(0, totalMeta - totalFat),
+         diasRest > 0 ? Math.max(0, totalMeta - totalFat) / diasRest : 0],
+  ];
+  const wsM = XLSX.utils.aoa_to_sheet(metasRows);
+  wsM['!cols'] = [{ wch: 18 }, { wch: 16 }, { wch: 16 }, { wch: 12 }, { wch: 14 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, wsM, 'Metas');
+
+  XLSX.writeFile(wb, 'afprint-rateio-metas.xlsx');
 }
 
 function esc(s) {
